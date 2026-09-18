@@ -1,0 +1,26 @@
+# System
+base
+base-devel
+efibootmgr
+linux
+linux-firmware
+linux-lts
+man-db
+mkinitcpio
+networkmanager
+sudo
+zram-generator
+
+# Shell and tools
+bash-completion
+git
+mise
+openssh
+plocate
+tcpdump
+tree
+zsh
+
+# Containers
+docker
+docker-compose

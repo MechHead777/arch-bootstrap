@@ -1,0 +1,24 @@
+# Compositor and desktop pieces
+bluetui
+cliphist
+fuzzel
+kitty
+mako
+niri
+playerctl
+wl-clipboard
+wlsunset
+xwayland-satellite
+
+# Fonts
+noto-fonts-emoji
+ttf-jetbrains-mono-nerd
+
+# Audio
+pipewire
+pipewire-pulse
+wireplumber
+
+# Applications
+librewolf
+obsidian

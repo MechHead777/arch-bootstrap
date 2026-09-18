@@ -1,0 +1,6 @@
+asciiquarium
+cava
+cmatrix
+doge
+figlet
+lolcat

@@ -1,0 +1,8 @@
+audacity
+freecad
+gimp
+inkscape
+libreoffice-fresh
+lmms
+obs-studio
+vlc
