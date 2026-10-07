@@ -1,0 +1,2 @@
+# Members of wheel may run any command, after entering their password.
+%wheel ALL=(ALL:ALL) ALL
