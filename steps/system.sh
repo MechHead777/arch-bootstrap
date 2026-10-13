@@ -37,7 +37,8 @@ install_file() {
     local mode="$1" src="$2" dest="$3"
     [ -f "$src" ] || die "missing source file: $src"
 
-    if cmp -s "$src" "$dest" 2>/dev/null; then
+    # sudoers files are readable only by root, even when already correct.
+    if sudo cmp -s "$src" "$dest" 2>/dev/null; then
         printf '%s already up to date\n' "$dest"
     else
         run sudo install -D -m "$mode" "$src" "$dest"
