@@ -2,7 +2,7 @@
 
 Takes a blank machine to a working Arch system: partitioned and installed, packages in place, system settings applied, dotfiles applied, and DevPod ready to build containers.
 
-**Status: installer configuration and bootstrap tested from a fresh UEFI VM, including LUKS2 root, both kernels, repeat bootstrap runs, zram, Docker access, DevPod configuration, and the niri desktop with LibreWolf. Interactive GitHub authentication was skipped in the test VM.**
+**Status: installer configuration and bootstrap tested from a fresh UEFI VM, including LUKS2 root, both kernels, repeat bootstrap runs, zram, Docker access, a DevPod workspace with dotfiles, and the niri desktop with LibreWolf. Interactive GitHub authentication was skipped in the test VM.**
 
 ## Part of the stateless workstation
 
@@ -198,7 +198,7 @@ After the install succeeds, shut the VM down before taking a snapshot with `qemu
 
 Phase 2 touches nothing until you let it. Walk through it with `DRY_RUN=1 ./bootstrap.sh`.
 
-The fresh-install VM test verified encrypted root with an unencrypted EFI partition, booting both `linux` and `linux-lts`, a repeated desktop bootstrap run, active zram, Docker access without sudo, no failed system services, and no missing declared desktop packages. The niri session, terminal, application launcher, and LibreWolf browsing were also checked. DevPod's Docker provider was configured after re-login; creating a DevPod workspace and interactive GitHub authentication were not part of this test.
+The fresh-install VM test verified encrypted root with an unencrypted EFI partition, booting both `linux` and `linux-lts`, a repeated desktop bootstrap run, active zram, Docker access without sudo, no failed system services, and no missing declared desktop packages. The niri session, terminal, application launcher, and LibreWolf browsing were also checked. DevPod's Docker provider was configured after re-login. A workspace built from `dev-container-playground`, accepted an SSH session as `vscode`, provided the mise tools, and reported no pending changes from `chezmoi status`. Interactive GitHub authentication was skipped.
 
 # What Stays Manual
 
