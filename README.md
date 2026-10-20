@@ -107,6 +107,7 @@ Skip this phase on machines that never push to GitHub, such as test virtual mach
 | `services` | Enables NetworkManager and docker |
 | `dotfiles` | `chezmoi init --apply MechHead777/dotfiles`, which installs the CLI tools through mise |
 | `devpod` | Installs DevPod, adds the docker provider, and sets the dotfiles options |
+| `optional` | Offers interactive GUI and TUI package menus; run separately with `--only optional` |
 | `finish` | SSH key, `gh auth login`, `gh ssh-key add`, and switches the dotfiles remote to SSH |
 
 Hardware differences are detected, not configured: microcode follows the CPU vendor, and the laptop list is used only when a battery is present.
@@ -118,6 +119,7 @@ Hardware differences are detected, not configured: microcode follows the CPU ven
 | `./bootstrap.sh` | Runs every unattended step in order |
 | `./bootstrap.sh finish` | Runs the interactive phase |
 | `./bootstrap.sh --only <step>` | Runs one step |
+| `./bootstrap.sh --only optional` | Prompts for optional GUI and TUI applications |
 | `./bootstrap.sh --skip <step>` | Runs everything except one step |
 | `./bootstrap.sh --check` | Reports package drift and changes nothing |
 | `DRY_RUN=1 ./bootstrap.sh` | Prints what would happen without doing it |
@@ -126,7 +128,9 @@ Every step is safe to run again, so running `./bootstrap.sh` on an existing mach
 
 ## Keeping the Package Lists Honest
 
-`./bootstrap.sh --check` compares `pacman -Qqe` against `packages/*.txt` and prints two lists: packages declared but not installed, and packages installed by hand but not declared. It prints the command to fix each one and changes nothing itself.
+`./bootstrap.sh --check` compares explicitly installed packages from `pacman -Qqe` against `packages/base.txt` and the desktop/laptop lists selected for the current profile. Set `PROFILE=base`, `PROFILE=desktop`, or `PROFILE=laptop` to override automatic profile detection.
+
+It reports declared packages missing from that set and explicitly installed packages absent from the selected lists. Packages in `optional-gui.txt` and `optional-tui.txt`, plus `intel-ucode` and `amd-ucode`, are excluded from the extra-package report. It prints commands to address the differences and changes nothing itself.
 
 Removal is always manual. A script that uninstalls packages it doesn't recognize is not one you can trust with a working machine.
 
@@ -140,11 +144,14 @@ steps/
   services.sh
   dotfiles.sh
   devpod.sh
+  optional.sh
   finish.sh
 packages/
   base.txt                every machine
   desktop.txt             niri, fuzzel, mako, kitty, librewolf, fonts
   laptop.txt              battery and power packages
+  optional-gui.txt        optional GUI applications
+  optional-tui.txt        optional TUI applications
 system/                   files copied into /etc
 archinstall/
   config.json             installer defaults; disk and encryption selected manually
@@ -164,7 +171,6 @@ archinstall/
 | Network | NetworkManager | Handles roaming Wi-Fi and captive portals, and `nmtui` is a working escape hatch. systemd-networkd suits fixed machines better |
 | Browser | LibreWolf, from `extra` | Official repo, no AUR helper, no building. Its defaults, including clearing on close, are the wanted behavior |
 | AUR | Not used | Everything needed is in the official repos |
-| Firewall | Not installed | Nothing listens on the network. Revisit if that changes |
 | Secure boot | Not used | It complicates every kernel update, and LUKS already covers a stolen laptop |
 | Hostname | Prompted at install | Named after the hardware and the install date, for example `inspiron-260917`. Roles change, hardware doesn't |
 | Language runtimes | None system-wide | node and python come from mise, per project |
