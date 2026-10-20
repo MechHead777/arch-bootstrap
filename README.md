@@ -98,6 +98,8 @@ This generates an SSH key, registers it with GitHub, and switches your dotfiles 
 
 Skip this phase on machines that never push to GitHub, such as test virtual machines.
 
+After bootstrap is complete, follow the [Dev Container Playground workspace guide](https://github.com/MechHead777/dev-container-playground#new-machine-setup) to clone a project, start it with `devpod up .`, and verify the container's dotfiles and tools.
+
 # What the Steps Do
 
 | Step | Does |
@@ -172,7 +174,7 @@ archinstall/
 | Browser | LibreWolf, from `extra` | Official repo, no AUR helper, no building. Its defaults, including clearing on close, are the wanted behavior |
 | AUR | Not used | Everything needed is in the official repos |
 | Secure boot | Not used | It complicates every kernel update, and LUKS already covers a stolen laptop |
-| Hostname | Prompted at install | Named after the hardware and the install date, for example `inspiron-260917`. Roles change, hardware doesn't |
+| Hostname | Selected manually at install | Named after the hardware and the install date, for example `inspiron-260917`. Roles change, hardware doesn't |
 | Language runtimes | None system-wide | node and python come from mise, per project |
 
 # Testing
