@@ -2,7 +2,7 @@
 
 Takes a blank machine to a working Arch system: partitioned and installed, packages in place, system settings applied, dotfiles applied, and DevPod ready to build containers.
 
-**Status: bootstrap scripts implemented and dry-run checked on the laptop. Installer configuration and end-to-end VM testing are pending.**
+**Status: installer configuration and bootstrap tested from a fresh UEFI VM, including LUKS2 root, both kernels, repeat bootstrap runs, zram, Docker access, DevPod configuration, and the niri desktop with LibreWolf. Interactive GitHub authentication was skipped in the test VM.**
 
 ## Part of the stateless workstation
 
@@ -51,7 +51,20 @@ curl -fsSLO https://raw.githubusercontent.com/MechHead777/arch-bootstrap/main/ar
 
 Then, run the installer against it: `archinstall --config config.json`
 
-> The config sets the locale, keymap, timezone, filesystem, bootloader, and the extra packages the bootstrap needs. It does not set the disk, hostname, or passwords. archinstall asks for those, so no machine-specific values and no credentials live in this repo.
+The config was exported by **archinstall 4.5**, then had its disk, hostname, and authentication sections removed. It was tested with archinstall 4.5 on the 2026.10.01 ISO; configuration formats can change between releases.
+
+The config sets the locale, keymap, timezone, kernels, systemd-boot with unified kernel images, NetworkManager, Minimal profile, and the extra packages `git` and `curl`. Installer swap is disabled; bootstrap configures zram later.
+
+Before selecting Install, complete these choices in the installer menus:
+
+- **Disk configuration:** select the intended disk and the default layout with ext4. Use a single root partition, without a separate `/home`. Keep the EFI partition unencrypted and mounted at `/boot`.
+- **Disk encryption:** choose LUKS, enter a passphrase, and select the root partition for encryption. Confirm encryption is enabled in the installation summary; leaving the passphrase empty can cancel encryption setup.
+- **Hostname:** set it explicitly. Omitting it from the config leaves archinstall's default `archlinux`; it does not force a prompt.
+- **Authentication:** create your user with sudo access and set the passwords you need. Keep passwords and exported credential files outside this repository.
+
+Name this machine after its hardware, not its role (roles change). The digits are the install date, for example `inspiron-260917`.
+
+Review the selected disk, ext4 root, encryption, and bootloader before confirming installation. In archinstall 4.5, filesystem and encryption settings are attached to a particular disk layout, so they must be selected manually in this portable configuration.
 
 After it's finished, reboot into the new system and log in as your user.
 
@@ -68,6 +81,8 @@ cd arch-bootstrap
 ```
 
 You're asked for your sudo password once at the start. Everything after that is unattended, and the whole run is logged to `~/.local/state/arch-bootstrap/`.
+
+On a new system, the first run adds your user to the Docker group. If DevPod reports that the group is not active, log out and back in, then run `./bootstrap.sh --only devpod` to finish provider configuration. A reboot also activates the new group membership.
 
 > If a step fails, the script prints the log path and the line that failed. Fix the problem, then re-run just that step with `./bootstrap.sh --only <step>`.
 
@@ -132,7 +147,7 @@ packages/
   laptop.txt              battery and power packages
 system/                   files copied into /etc
 archinstall/
-  config.json             disk layout, bootloader, locale, extra packages
+  config.json             installer defaults; disk and encryption selected manually
 ```
 
 # Decisions
@@ -177,9 +192,13 @@ qemu-system-x86_64 -enable-kvm -m 4096 -smp 4 \
 
 > UEFI firmware is required, because systemd-boot does not work under BIOS. The `edk2-ovmf` package provides it.
 
-After the install succeeds, take a snapshot with `qemu-img snapshot -c installed arch-test.qcow2`. Phase 2 can then be tested repeatedly from that point with `qemu-img snapshot -a installed arch-test.qcow2`.
+For a niri desktop test, the VM also needs 3D acceleration. On the tested Arch host, install `qemu-ui-gtk`, `qemu-ui-opengl`, `qemu-hw-display-virtio-vga`, `qemu-hw-display-virtio-gpu`, `qemu-hw-display-virtio-vga-gl`, and `qemu-hw-display-virtio-gpu-gl` alongside the QEMU and OVMF packages. Add `-device virtio-vga-gl -display gtk,gl=on` to the QEMU command. Use `PROFILE=desktop ./bootstrap.sh` to exercise desktop packages in the VM. In the QEMU window, Ctrl+Alt+G toggles keyboard and mouse capture so desktop shortcuts reach the guest.
+
+After the install succeeds, shut the VM down before taking a snapshot with `qemu-img snapshot -c installed arch-test.qcow2`. Phase 2 can then be tested repeatedly from that point with `qemu-img snapshot -a installed arch-test.qcow2`, also while the VM is shut down.
 
 Phase 2 touches nothing until you let it. Walk through it with `DRY_RUN=1 ./bootstrap.sh`.
+
+The fresh-install VM test verified encrypted root with an unencrypted EFI partition, booting both `linux` and `linux-lts`, a repeated desktop bootstrap run, active zram, Docker access without sudo, no failed system services, and no missing declared desktop packages. The niri session, terminal, application launcher, and LibreWolf browsing were also checked. DevPod's Docker provider was configured after re-login; creating a DevPod workspace and interactive GitHub authentication were not part of this test.
 
 # What Stays Manual
 
