@@ -6,6 +6,7 @@ kitty
 mako
 niri
 playerctl
+udiskie
 wl-clipboard
 wlsunset
 xwayland-satellite
